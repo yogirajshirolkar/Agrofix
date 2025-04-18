@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agrofix</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ——— Your existing CSS ——— */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #43a047; color: white;
+      padding: 1rem 0; text-align: center;
+      font-size: 1.5rem;
+    }
+    .login-screen {
+      max-width: 400px; margin: 5rem auto;
+      padding: 2rem; background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .login-screen h2 { margin-bottom: 1rem; color: #2e7d32; text-align: center; }
+    .login-screen input, .login-screen button {
+      width:100%; padding:0.75rem; margin-bottom:1rem;
+      border-radius:8px; border:1px solid #ccc;
+    }
+    .login-screen button {
+      background:#43a047; color:white; font-size:1rem;
+      border:none; cursor:pointer;
+    }
+    .login-screen button:hover { background:#2e7d32; }
+
+    .product-item {
+      margin:1rem 0; padding:1rem; background:#fff;
+      border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1);
+      display:flex; align-items:center; gap:10px;
+    }
+    .product-item img {
+      width:80px; height:80px; object-fit:cover;
+      border-radius:8px;
+    }
+    .product-item h4 { margin:0; color:#2e7d32; }
+    .product-item p { margin:0.5rem 0; }
+
+    .product-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:1rem; margin-top:2rem;
+    }
+
+    .order-form {
+      margin-top:2rem; background:#fff;
+      padding:1.5rem; border-radius:8px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    }
+    .order-form input, .order-form select,
+    .order-form textarea, .order-form button {
+      width:100%; padding:0.75rem; margin-bottom:1rem;
+      border-radius:8px; border:1px solid #ccc;
+    }
+    .order-form textarea {
+      /* ensure textarea is tall enough */
+      min-height:100px; resize:vertical;
+    }
+    .order-form button {
+      background:#43a047; color:white;
+      font-size:1rem; border:none; cursor:pointer;
+    }
+    .order-form button:hover { background:#2e7d32; }
+
+    .status { padding:20px; background:#f3f3f3; border-radius:8px; }
+
+    .admin-panel {
+      background:#fff; padding:2rem;
+      border-radius:12px; box-shadow:0 8px 16px rgba(0,0,0,0.1);
+    }
+    .admin-panel button {
+      background:#e74c3c; color:white; padding:1rem;
+      font-size:1rem; border:none; border-radius:8px;
+      cursor:pointer;
+    }
+    .admin-panel button:hover { background:#c0392b; }
+
+    @media (max-width:768px) {
+      .product-grid { grid-template-columns:1fr; }
+      .login-screen { width:90%; padding:1rem; }
+      header { font-size:1.2rem; }
+      .order-form { margin-top:1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Agrofix - Bulk Veggie/Fruit Orders</h1>
+  </header>
+
+  <div class="login-screen" id="loginScreen">
+    <h2>Select Login Type</h2>
+    <button onclick="showLogin('user')">User Login</button>
+    <button onclick="showLogin('admin')">Admin Login</button>
+
+    <div id="userLogin" style="display:none;">
+      <h2>User Login</h2>
+      <input type="text" id="userPhone" placeholder="Phone Number" required />
+      <input type="password" id="userPass" placeholder="Password" required />
+      <button onclick="validateUserLogin()">Login as User</button>
+    </div>
+
+    <div id="adminLogin" style="display:none;">
+      <h2>Admin Login</h2>
+      <input type="text" id="adminPhone" placeholder="Phone Number" required />
+      <input type="password" id="adminPass" placeholder="Password" required />
+      <button onclick="validateAdminLogin()">Login as Admin</button>
+    </div>
+  </div>
+
+  <main id="mainContent" style="display:none;">
+    <!-- User Panel -->
+    <div class="user-panel" id="userPanel" style="display:none;">
+      <h2>Welcome to Agrofix</h2>
+      <button onclick="logout('user')">Logout</button>
+      <section class="product-grid" id="productGrid"></section>
+
+      <section class="order-form">
+        <h2>Place Your Order</h2>
+        <form id="orderForm">
+          <label>Select Product:</label>
+          <select id="productSelect"></select>
+
+          <label>Quantity (kg):</label>
+          <input type="number" id="quantity" min="1" required />
+
+          <label>Your Name:</label>
+          <input type="text" id="name" required />
+
+          <label>Contact Number:</label>
+          <input type="text" id="contact" required />
+
+          <label>Delivery Address:</label>
+          <textarea id="address" required></textarea>
+
+          <button type="submit">Submit Order</button>
+        </form>
+      </section>
+
+      <section class="status" id="orderStatus">
+        <h2>Track Your Orders</h2>
+        <div id="orderList"></div>
+      </section>
+    </div>
+
+    <!-- Admin Panel -->
+    <section class="admin-panel" id="adminPanel" style="display:none;">
+      <h2>Admin Dashboard</h2>
+      <button onclick="logout('admin')">Logout</button>
+
+      <div id="adminOrders">
+        <h3>Order Management</h3>
+        <div id="adminOrderList"></div>
+      </div>
+
+      <div id="adminInventory">
+        <h3>Inventory Management</h3>
+        <form id="inventoryForm">
+          <input type="text" id="newProductName" placeholder="Product Name" required />
+          <input type="number" id="newProductPrice" placeholder="Price per kg" required />
+          <button type="submit">Add Product</button>
+        </form>
+        <ul id="inventoryList"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const adminCredentials = { phone: '9876543210', password: 'admin123' };
+    const userCredentials  = { phone: '1234567890', password: 'user123' };
+
+    let products = [
+      { id:1, name:'Tomato', price:20, image:'https://example.com/tomato.jpg' },
+      { id:2, name:'Potato', price:15, image:'https://example.com/potato.jpg' },
+      { id:3, name:'Carrot', price:25, image:'https://example.com/carrot.jpg' },
+      { id:4, name:'Apple',  price:40, image:'https://example.com/apple.jpg' },
+      { id:5, name:'Onion',  price:18, image:'https://example.com/onion.jpg' },
+      { id:6, name:'Banana', price:30, image:'https://example.com/banana.jpg' },
+      { id:7, name:'Spinach',price:35, image:'https://example.com/spinach.jpg'},
+      { id:8, name:'Mango',  price:50, image:'https://example.com/mango.jpg' }
+    ];
+
+    let orders = [], adminOrders = [];
+
+    function showLogin(role) {
+      document.getElementById('userLogin').style.display  = role==='user'  ? 'block':'none';
+      document.getElementById('adminLogin').style.display = role==='admin' ? 'block':'none';
+    }
+
+    function validateUserLogin() {
+      const phone = document.getElementById('userPhone').value;
+      const pass  = document.getElementById('userPass').value;
+      if (phone===userCredentials.phone && pass===userCredentials.password) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('userPanel').style.display   = 'block';
+        document.getElementById('mainContent').style.display = 'block';
+        renderProducts();
+        renderUserOrders();         // ← initial render
+      } else alert('Invalid user credentials');
+    }
+
+    function validateAdminLogin() {
+      const phone = document.getElementById('adminPhone').value;
+      const pass  = document.getElementById('adminPass').value;
+      if (phone===adminCredentials.phone && pass===adminCredentials.password) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display  = 'block';
+        document.getElementById('mainContent').style.display = 'block';
+        renderAdminOrders();
+        renderInventory();
+      } else alert('Invalid admin credentials');
+    }
+
+    function logout(role) {
+      document.getElementById(role==='admin'?'adminPanel':'userPanel').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('mainContent').style.display = 'none';
+    }
+
+    // — render product grid + dropdown
+    function renderProducts() {
+      const grid   = document.getElementById('productGrid');
+      const select = document.getElementById('productSelect');
+      grid.innerHTML   = '';
+      select.innerHTML = '';
+      products.forEach(p => {
+        grid.innerHTML += `
+          <div class="product-item">
+            <img src="${p.image}" alt="${p.name}">
+            <div>
+              <h4>${p.name}</h4>
+              <p>₹${p.price} / kg</p>
+            </div>
+          </div>`;
+        select.innerHTML += `<option value="${p.id}">${p.name} - ₹${p.price}</option>`;
+      });
+    }
+
+    // — user places order
+    document.getElementById('orderForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const pid      = +document.getElementById('productSelect').value;
+      const prodObj  = products.find(x=>x.id===pid);
+      const newOrder = {
+        id: orders.length+1,
+        product: prodObj.name,
+        quantity: document.getElementById('quantity').value,
+        name: document.getElementById('name').value,
+        contact: document.getElementById('contact').value,
+        address: document.getElementById('address').value,
+        status:'Pending'
+      };
+      orders.push(newOrder);
+      adminOrders.push(newOrder);
+      alert('Order placed! Awaiting approval.');
+      renderUserOrders();    // ← update user tracking view
+      renderAdminOrders();   // ← show to admin
+      e.target.reset();
+    });
+
+    // — render user’s order tracking
+    function renderUserOrders() {
+      const list = document.getElementById('orderList');
+      list.innerHTML = orders.map(o => `
+        <div class="product-item">
+          <div>
+            <p><strong>Order #${o.id}</strong><br/>
+            ${o.product} × ${o.quantity}kg<br/>
+            Status: <em>${o.status}</em></p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // — render admin order list
+    function renderAdminOrders() {
+      const list = document.getElementById('adminOrderList');
+      list.innerHTML = adminOrders.map((o,i) => `
+        <div class="product-item">
+          <div>
+            <p><strong>${o.name}</strong> ordered ${o.quantity}kg of ${o.product}<br/>
+            Contact: ${o.contact}<br/>
+            Address: ${o.address}<br/>
+            Status: ${o.status}</p>
+            <button onclick="updateStatus(${i}, 'In Progress')">In Progress</button>
+            <button onclick="updateStatus(${i}, 'Delivered')">Delivered</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // — admin updates status
+    function updateStatus(idx, newStatus) {
+      orders[idx].status      = newStatus;
+      adminOrders[idx].status = newStatus;
+      renderUserOrders();    // ← push change to user view
+      renderAdminOrders();
+    }
+
+    // — inventory
+    document.getElementById('inventoryForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name  = document.getElementById('newProductName').value;
+      const price = +document.getElementById('newProductPrice').value;
+      products.push({ id:Date.now(), name, price, image:'https://example.com/default.jpg' });
+      renderInventory();
+      renderProducts();
+      e.target.reset();
+    });
+
+    function renderInventory() {
+      const ul = document.getElementById('inventoryList');
+      ul.innerHTML = products.map(p => `<li>${p.name} - ₹${p.price}</li>`).join('');
+    }
+  </script>
+</body>
+</html>

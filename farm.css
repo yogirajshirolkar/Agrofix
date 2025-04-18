@@ -1,0 +1,115 @@
+/* ====== Global & Body Background ====== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: 
+    /* subtle diagonal stripes */
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.05),
+      rgba(255,255,255,0.05) 10px,
+      transparent 10px,
+      transparent 20px
+    ),
+    /* main gradient */
+    linear-gradient(135deg, #e0f7fa 0%, #fce4ec 100%);
+  color: #333;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* ====== Header with overlay ====== */
+header {
+  position: relative;
+  background: url('https://yourdomain.com/assets/farm-bg.jpg') center/cover no-repeat;
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+  overflow: hidden;
+}
+header::after {
+  content: "";
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0, 77, 64, 0.6);
+  pointer-events: none;
+}
+header h1 {
+  position: relative;
+  font-size: 2.5rem;
+  z-index: 1;
+}
+
+/* ====== Login Screen ====== */
+.login-screen {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(8px);
+}
+
+/* ====== Page Sections ====== */
+.page-section {
+  background: white;
+  background-clip: padding-box;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: transform 0.2s;
+}
+.page-section:hover {
+  transform: translateY(-4px);
+}
+
+/* ====== Product Grid & Cards ====== */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+.product-item {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 10px;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.05), -6px -6px 16px rgba(255,255,255,0.7);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.product-item img {
+  border-radius: 8px;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ====== Forms & Buttons ====== */
+input, select, textarea, button {
+  border-radius: 8px;
+  font-size: 1rem;
+}
+button {
+  background: linear-gradient(to right, #66bb6a, #43a047);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: background 0.3s, transform 0.1s;
+}
+button:hover {
+  background: linear-gradient(to right, #43a047, #2e7d32);
+  transform: translateY(-2px);
+}
+
+/* ====== Order & Admin Cards ====== */
+#orderList .product-card,
+#adminOrderList .product-card {
+  background: #ffffff;
+  border-left: 4px solid #43a047;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+/* ====== Responsive Tweaks ====== */
+@media (max-width: 768px) {
+  header h1 { font-size: 1.8rem; }
+  .product-grid { grid-template-columns: 1fr; }
+  .login-screen { margin: 2rem 1rem; padding: 1.5rem; }
+}
